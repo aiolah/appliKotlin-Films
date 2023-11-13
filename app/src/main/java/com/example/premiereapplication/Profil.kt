@@ -27,6 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.premiereapplication.ui.theme.VertDeau
 
 @Composable
@@ -128,9 +130,9 @@ fun Reseaux() {
 }
 
 @Composable
-fun ButtonExplorer() {
+fun ButtonExplorer(navController: NavHostController) {
     Button(
-        onClick = { /*TODO*/ },
+        onClick = { navController.navigate("films") },
         colors = ButtonDefaults.buttonColors(backgroundColor = VertDeau)
     ) {
         Text(text = "Explorer", color = Color.White)
@@ -138,7 +140,7 @@ fun ButtonExplorer() {
 }
 
 @Composable
-fun Profil(classes: WindowSizeClass) {
+fun Profil(classes: WindowSizeClass, navController: NavHostController) {
     val classeHauteur = classes.heightSizeClass
     val classeLargeur = classes.widthSizeClass
     when (classeLargeur) {
@@ -157,9 +159,9 @@ fun Profil(classes: WindowSizeClass) {
                     Reseaux()
                 }
 
-                // Spacer(modifier = Modifier.height(35.dp))
+                Spacer(modifier = Modifier.height(35.dp))
 
-                // ButtonExplorer()
+                ButtonExplorer(navController)
             }
         // Téléphone en mode paysage
         else ->
@@ -173,7 +175,7 @@ fun Profil(classes: WindowSizeClass) {
                 Column(verticalArrangement = Arrangement.Center) {
                     Reseaux()
                     Spacer(modifier = Modifier.height(20.dp))
-                    // ButtonExplorer()
+                    ButtonExplorer(navController)
                 }
 
             }

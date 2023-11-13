@@ -57,8 +57,10 @@ class MainActivity : ComponentActivity() {
 }
 
 sealed class Destination(val destination: String, val label: String, val icon: Int, val description: String) {
-    object Profil : Destination("profil", "Mon Profil", R.drawable.web, "Profil")
-    object Films : Destination("films", "Films", R.drawable.camera, "Films")
+    object Profil : Destination("profil", "Mon Profil", R.drawable.user, "Profil")
+    object Films : Destination("films", "Films", R.drawable.films, "Films")
+    object Series : Destination("series", "Séries", R.drawable.series, "Séries")
+    object Acteurs : Destination("acteurs", "Acteurs", R.drawable.acteurs, "Acteurs")
 }
 
 @Composable
@@ -69,15 +71,17 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
     // currentDestination représente l'étiquette de la destination actuelle
     val currentDestination = navBackStackEntry?.destination?.route;
 
-    val destinations = listOf(Destination.Profil, Destination.Films);
+    val destinations = listOf(Destination.Profil, Destination.Films, Destination.Series, Destination.Acteurs);
 
     // Le Scaffold rajoute des fonctionnalités : bottomBar (barre de navigation) et NavHost (ce qu'il y a au-dessus de la bottomBar)
     // C'est le Scaffold qui va charger le composant Profil
     Scaffold(
-        bottomBar = { BottomNavigation {
+        bottomBar = {
+            // Si la vue courante n'est pas la page Profil, alors on affiche la barre de navigation
+            if(currentDestination != "profil") BottomNavigation(backgroundColor = VertDeau) {
             destinations.forEach { screen ->
                 BottomNavigationItem(
-                    icon = { Icon(painter = painterResource(screen.icon), screen.description) },
+                    icon = { Icon(painter = painterResource(screen.icon), screen.description, modifier = Modifier.fillMaxSize(0.42F)) },
                     label = { Text(screen.label) },
                     selected =
                     currentDestination == screen.destination,
@@ -86,8 +90,10 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
         }) { innerPadding ->
         NavHost(navController, startDestination = Destination.Profil.destination,
             Modifier.padding(innerPadding)) {
-            composable(Destination.Profil.destination) { Profil(windowSizeClass) }
+            composable(Destination.Profil.destination) { Profil(windowSizeClass, navController) }
             composable(Destination.Films.destination) { Films() }
+            composable(Destination.Series.destination) { Series() }
+            composable(Destination.Acteurs.destination) { Acteurs() }
         }
     }
 }
