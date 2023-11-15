@@ -29,12 +29,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.premiereapplication.ui.theme.PremiereApplicationTheme
 import com.example.premiereapplication.ui.theme.VertDeau
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -73,6 +75,8 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
 
     val destinations = listOf(Destination.Profil, Destination.Films, Destination.Series, Destination.Acteurs);
 
+    val viewModel: MainViewModel = MainViewModel()
+
     // Le Scaffold rajoute des fonctionnalités : bottomBar (barre de navigation) et NavHost (ce qu'il y a au-dessus de la bottomBar)
     // C'est le Scaffold qui va charger le composant Profil
     Scaffold(
@@ -91,7 +95,7 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
         NavHost(navController, startDestination = Destination.Profil.destination,
             Modifier.padding(innerPadding)) {
             composable(Destination.Profil.destination) { Profil(windowSizeClass, navController) }
-            composable(Destination.Films.destination) { Films() }
+            composable(Destination.Films.destination) { Films(viewModel) }
             composable(Destination.Series.destination) { Series() }
             composable(Destination.Acteurs.destination) { Acteurs() }
         }
