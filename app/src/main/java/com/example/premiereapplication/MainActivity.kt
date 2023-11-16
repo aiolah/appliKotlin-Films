@@ -1,8 +1,10 @@
 package com.example.premiereapplication
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -30,15 +32,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.premiereapplication.ui.theme.PremiereApplicationTheme
 import com.example.premiereapplication.ui.theme.VertDeau
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,10 +66,12 @@ class MainActivity : ComponentActivity() {
 sealed class Destination(val destination: String, val label: String, val icon: Int, val description: String) {
     object Profil : Destination("profil", "Mon Profil", R.drawable.user, "Profil")
     object Films : Destination("films", "Films", R.drawable.films, "Films")
+    object Film : Destination("film/{id}", "Film", R.drawable.films, "Détails du film")
     object Series : Destination("series", "Séries", R.drawable.series, "Séries")
     object Acteurs : Destination("acteurs", "Acteurs", R.drawable.acteurs, "Acteurs")
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navigation(windowSizeClass: WindowSizeClass) {
     val navController = rememberNavController();
@@ -73,9 +80,9 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
     // currentDestination représente l'étiquette de la destination actuelle
     val currentDestination = navBackStackEntry?.destination?.route;
 
-    val destinations = listOf(Destination.Profil, Destination.Films, Destination.Series, Destination.Acteurs);
+    val destinations = listOf(Destination.Profil, Destination.Films, Destination.Film, Destination.Series, Destination.Acteurs);
 
-    val viewModel: MainViewModel = MainViewModel()
+    val viewModel = MainViewModel()
 
     // Le Scaffold rajoute des fonctionnalités : bottomBar (barre de navigation) et NavHost (ce qu'il y a au-dessus de la bottomBar)
     // C'est le Scaffold qui va charger le composant Profil
@@ -84,20 +91,31 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
             // Si la vue courante n'est pas la page Profil, alors on affiche la barre de navigation
             if(currentDestination != "profil") BottomNavigation(backgroundColor = VertDeau) {
             destinations.forEach { screen ->
-                BottomNavigationItem(
-                    icon = { Icon(painter = painterResource(screen.icon), screen.description, modifier = Modifier.fillMaxSize(0.42F)) },
-                    label = { Text(screen.label) },
-                    selected =
-                    currentDestination == screen.destination,
-                    onClick = { navController.navigate(screen.destination) })
-            }}
+                if(screen.destination != "film/{id}") {
+                    BottomNavigationItem(
+                        icon = { Icon(painter = painterResource(screen.icon), screen.description, modifier = Modifier.fillMaxSize(0.42F)) },
+                        label = { Text(screen.label) },
+                        selected =
+                        currentDestination == screen.destination,
+                        onClick = { navController.navigate(screen.destination) })
+                }}
+            }
         }) { innerPadding ->
         NavHost(navController, startDestination = Destination.Profil.destination,
             Modifier.padding(innerPadding)) {
             composable(Destination.Profil.destination) { Profil(windowSizeClass, navController) }
-            composable(Destination.Films.destination) { Films(viewModel) }
-            composable(Destination.Series.destination) { Series() }
-            composable(Destination.Acteurs.destination) { Acteurs() }
+            composable(Destination.Films.destination) { Films(viewModel, navController) }
+            composable(Destination.Series.destination) { Series(viewModel) }
+            composable(Destination.Acteurs.destination) { Acteurs(viewModel) }
+
+            composable(
+                Destination.Film.destination,
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
+            ) { navBackStackEntry ->
+                /* Extracting the id from the route */
+                val id = navBackStackEntry.arguments?.getString("id")
+                Film(viewModel, id)
+            }
         }
     }
 }

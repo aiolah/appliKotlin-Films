@@ -118,7 +118,7 @@ fun IconWeb() {
 fun Reseaux() {
     Row {
         IconMail()
-        Link(content = "   aiolah.vaiti@gmail.com")
+        Link(content = "   aiolah.vaiti@gmail.com", )
     }
 
     Spacer(modifier = Modifier.height(5.dp))
