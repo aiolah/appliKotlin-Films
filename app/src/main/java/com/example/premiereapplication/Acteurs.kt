@@ -23,7 +23,7 @@ fun Acteurs(viewModel: MainViewModel) {
     val actors by viewModel.actors.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = true) { viewModel.getActors() }
 
-    Text(text = "Les acteurs populaires de la semaine")
+    // Text(text = "Les acteurs populaires de la semaine")
 
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
         items(actors) { actor ->
@@ -38,8 +38,6 @@ fun ActorCard(actor: Person) {
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         modifier = Modifier
             .padding(20.dp)
-            .height(325.dp)
-            .requiredHeight(325.dp)
     ) {
         AsyncImage(
             model = "https://image.tmdb.org/t/p/w780/${actor.profile_path}",

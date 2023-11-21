@@ -36,18 +36,16 @@ import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Films(viewModel: MainViewModel, navController: NavHostController, query: String) {
+fun SearchFilms(viewModel: MainViewModel, navController: NavHostController, query: String) {
     // Observation dans un composant compose, transforme le MutableStateFlow en une liste
     val movies by viewModel.movies.collectAsStateWithLifecycle()
 
     // Pour n'appeler viewModel.getMovies() qu'une seule fois = première apparition du composant Films
     LaunchedEffect(key1 = query)
     {
-        viewModel.getMovies()
+        viewModel.getSearchMovies(query)
     }
 
-    // Text(text = "Les films populaires de la semaine")
-    
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
         items(movies) { movie ->
             try {
@@ -66,34 +64,5 @@ fun Films(viewModel: MainViewModel, navController: NavHostController, query: Str
 
             MovieCard(movie, navController)
         }
-    }
-
-    // Affichage des titres des films
-    /* Column() {
-        for(movie in movies) {
-            Row() {
-                Text(text = movie.title)
-            }
-        }
-    } */
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MovieCard(movie: Movie, navController: NavHostController) {
-    ElevatedCard(
-        onClick = { navController.navigate("film/${movie.id}") },
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        modifier = Modifier
-            .padding(20.dp)
-            //.height(325.dp)
-            //.requiredHeight(325.dp)
-    ) {
-        AsyncImage(
-            model = "https://image.tmdb.org/t/p/w780/${movie.poster_path}",
-            contentDescription = null,
-        )
-        Text(text = movie.title, modifier = Modifier.padding(7.dp), fontWeight = FontWeight.Bold)
-        Text(text = movie.release_date, modifier = Modifier.padding(7.dp))
     }
 }
