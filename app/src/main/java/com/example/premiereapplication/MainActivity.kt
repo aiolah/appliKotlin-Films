@@ -91,6 +91,7 @@ sealed class Destination(val destination: String, val label: String, val icon: I
     object Films : Destination("films", "Films", R.drawable.films, "Films")
     object Film : Destination("film/{id}", "Film", R.drawable.films, "Détails du film")
     object SearchFilms : Destination("searchfilms", "SearchFilms", R.drawable.films, "Recherche films")
+    object ResultFilm : Destination("resultfilm/{id}", "ResultFilm", R.drawable.films, "Résultat film")
     object Series : Destination("series", "Séries", R.drawable.series, "Séries")
     object Acteurs : Destination("acteurs", "Acteurs", R.drawable.acteurs, "Acteurs")
 }
@@ -137,7 +138,17 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                         },
                         placeholder = { Text("Barbie") },
                         leadingIcon = { IconButton(
-                            onClick = { navController.popBackStack() }
+                            onClick = {
+                                val previousBackStackEntry = navController.previousBackStackEntry
+                                val previousDestination = previousBackStackEntry?.destination
+                                val previousRoute = previousDestination?.route
+
+                                if(previousRoute == "films" || previousRoute == "series")
+                                {
+                                    showSearchBar = false
+                                }
+                                navController.popBackStack()
+                            }
                         ) {
                             Icon(Icons.Default.ArrowBack, contentDescription = null)
                         }},
@@ -164,12 +175,12 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                             ) {
                                 Text("FilmsApp")
 
-                                if (currentDestination == "films") {
+                                if(currentDestination == "films") {
                                     Text(" - Films")
                                 } else if (currentDestination == "series") {
                                     Text(" - Séries")
                                 }
-                                if (currentDestination == "acteurs") {
+                                if(currentDestination == "acteurs") {
                                     Text(" - Acteurs")
                                 }
                             }
@@ -209,7 +220,7 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
         NavHost(navController, startDestination = Destination.Profil.destination,
             Modifier.padding(innerPadding)) {
             composable(Destination.Profil.destination) { Profil(windowSizeClass, navController) }
-            composable(Destination.Films.destination) { Films(viewModel, navController, query) }
+            composable(Destination.Films.destination) { Films(viewModel, navController) }
             composable(Destination.Series.destination) { Series(viewModel) }
             composable(Destination.Acteurs.destination) { Acteurs(viewModel) }
 
@@ -223,6 +234,13 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
             }
 
             composable(Destination.SearchFilms.destination) { SearchFilms(viewModel, navController, query) }
+            composable(
+                Destination.ResultFilm.destination,
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
+            ) { navBackStackEntry ->
+                val id = navBackStackEntry.arguments?.getString("id")
+                ResultFilm(viewModel, id)
+            }
         }
     }
 }

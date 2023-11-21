@@ -3,16 +3,10 @@ package com.example.premiereapplication
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -26,13 +20,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.forEach
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -62,7 +52,27 @@ fun SearchFilms(viewModel: MainViewModel, navController: NavHostController, quer
                 Log.d("VAÏTI", "Erreur date")
             }
 
-            MovieCard(movie, navController)
+            ResultMovieCard(movie, navController)
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ResultMovieCard(movie: Movie, navController: NavHostController) {
+    ElevatedCard(
+        onClick = { navController.navigate("resultfilm/${movie.id}") },
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        modifier = Modifier
+            .padding(20.dp)
+        //.height(325.dp)
+        //.requiredHeight(325.dp)
+    ) {
+        AsyncImage(
+            model = "https://image.tmdb.org/t/p/w780/${movie.poster_path}",
+            contentDescription = null,
+        )
+        Text(text = movie.title, modifier = Modifier.padding(7.dp), fontWeight = FontWeight.Bold)
+        Text(text = movie.release_date, modifier = Modifier.padding(7.dp))
     }
 }

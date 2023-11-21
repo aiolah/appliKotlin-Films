@@ -3,16 +3,10 @@ package com.example.premiereapplication
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -26,25 +20,18 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.forEach
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Films(viewModel: MainViewModel, navController: NavHostController, query: String) {
+fun Films(viewModel: MainViewModel, navController: NavHostController) {
     // Observation dans un composant compose, transforme le MutableStateFlow en une liste
     val movies by viewModel.movies.collectAsStateWithLifecycle()
 
     // Pour n'appeler viewModel.getMovies() qu'une seule fois = première apparition du composant Films
-    LaunchedEffect(key1 = query)
-    {
-        viewModel.getMovies()
-    }
+    LaunchedEffect(key1 = true) { viewModel.getMovies() }
 
     // Text(text = "Les films populaires de la semaine")
     
