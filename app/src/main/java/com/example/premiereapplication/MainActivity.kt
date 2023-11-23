@@ -87,12 +87,16 @@ class MainActivity : ComponentActivity() {
 }
 
 sealed class Destination(val destination: String, val label: String, val icon: Int, val description: String) {
-    object Profil : Destination("profil", "Mon Profil", R.drawable.user, "Profil")
-    object Films : Destination("films", "Films", R.drawable.films, "Films")
-    object Film : Destination("film/{id}", "Film", R.drawable.films, "Détails du film")
-    object SearchFilms : Destination("searchfilms", "SearchFilms", R.drawable.films, "Recherche films")
-    object ResultFilm : Destination("resultfilm/{id}", "ResultFilm", R.drawable.films, "Résultat film")
-    object Series : Destination("series", "Séries", R.drawable.series, "Séries")
+    object Profil: Destination("profil", "Mon Profil", R.drawable.user, "Profil")
+    object Films: Destination("films", "Films", R.drawable.films, "Films")
+    object Film: Destination("film/{id}", "Film", R.drawable.films, "Détails du film")
+    object SearchFilms: Destination("searchfilms", "SearchFilms", R.drawable.films, "Recherche films")
+    object ResultFilm: Destination("resultfilm/{id}", "ResultFilm", R.drawable.films, "Résultat film")
+    object Series: Destination("series", "Séries", R.drawable.series, "Séries")
+    object Serie: Destination("serie/{id}", "Série", R.drawable.series, "Détails de la série")
+    object SearchSeries: Destination("searchseries", "SearchSeries", R.drawable.films, "Recherche films")
+    object ResultSerie: Destination("resultserie/{id}", "ResultFilm", R.drawable.films, "Résultat film")
+
     object Acteurs : Destination("acteurs", "Acteurs", R.drawable.acteurs, "Acteurs")
 }
 
@@ -130,7 +134,14 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                         },
                         onSearch = {
                             active = false
-                            navController.navigate(Destination.SearchFilms.destination)
+                            if(currentDestination == "films")
+                            {
+                                navController.navigate(Destination.SearchFilms.destination)
+                            }
+                            else if(currentDestination == "series")
+                            {
+                                navController.navigate(Destination.SearchSeries.destination)
+                            }
                         },
                         active = active,
                         onActiveChange = {
@@ -175,9 +186,9 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                             ) {
                                 Text("FilmsApp")
 
-                                if(currentDestination == "films") {
+                                if(currentDestination == "films" || currentDestination == "film/{id}") {
                                     Text(" - Films")
-                                } else if (currentDestination == "series") {
+                                } else if (currentDestination == "series" || currentDestination == "serie/{id}") {
                                     Text(" - Séries")
                                 }
                                 if(currentDestination == "acteurs") {
@@ -221,7 +232,7 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
             Modifier.padding(innerPadding)) {
             composable(Destination.Profil.destination) { Profil(windowSizeClass, navController) }
             composable(Destination.Films.destination) { Films(viewModel, navController) }
-            composable(Destination.Series.destination) { Series(viewModel) }
+            composable(Destination.Series.destination) { Series(viewModel, navController) }
             composable(Destination.Acteurs.destination) { Acteurs(viewModel) }
 
             composable(
@@ -232,6 +243,13 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                 val id = navBackStackEntry.arguments?.getString("id")
                 Film(viewModel, id)
             }
+            composable(
+                Destination.Serie.destination,
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
+            ) { navBackStackEntry ->
+                val id = navBackStackEntry.arguments?.getString("id")
+                Serie(viewModel, id)
+            }
 
             composable(Destination.SearchFilms.destination) { SearchFilms(viewModel, navController, query) }
             composable(
@@ -240,6 +258,15 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
             ) { navBackStackEntry ->
                 val id = navBackStackEntry.arguments?.getString("id")
                 ResultFilm(viewModel, id)
+            }
+
+            composable(Destination.SearchSeries.destination) { SearchSeries(viewModel, navController, query) }
+            composable(
+                Destination.ResultSerie.destination,
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
+            ) { navBackStackEntry ->
+                val id = navBackStackEntry.arguments?.getString("id")
+                ResultSerie(viewModel, id)
             }
         }
     }

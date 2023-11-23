@@ -19,11 +19,19 @@ class MainViewModel : ViewModel() {
     var movies = MutableStateFlow<List<Movie>>(listOf())
     var series = MutableStateFlow<List<Serie>>(listOf())
     var actors = MutableStateFlow<List<Person>>(listOf())
+
     var movie = MutableStateFlow(SingleMovie())
+    var serie = MutableStateFlow(SingleSerie())
 
     fun getMovies() {
         viewModelScope.launch {
-            movies.value = api.lastmovies("73fbeeb046f41168a80509da0ee03c8c").results
+            movies.value = api.lastmovies("73fbeeb046f41168a80509da0ee03c8c", "fr").results
+        }
+    }
+
+    fun getSingleMovie(id: String?) {
+        viewModelScope.launch {
+            movie.value = api.singlemovie(id.toString(), "73fbeeb046f41168a80509da0ee03c8c", "credits", "fr")
         }
     }
 
@@ -35,19 +43,25 @@ class MainViewModel : ViewModel() {
 
     fun getSeries() {
         viewModelScope.launch {
-            series.value = api.lastseries("73fbeeb046f41168a80509da0ee03c8c").results
+            series.value = api.lastseries("73fbeeb046f41168a80509da0ee03c8c", "fr").results
+        }
+    }
+
+    fun getSingleSerie(id: String?) {
+        viewModelScope.launch {
+            serie.value = api.singleserie(id.toString(), "73fbeeb046f41168a80509da0ee03c8c", "fr")
+        }
+    }
+
+    fun getSearchSeries(query: String) {
+        viewModelScope.launch {
+            series.value = api.searchseries("73fbeeb046f41168a80509da0ee03c8c", "false", "1", query).results
         }
     }
 
     fun getActors() {
         viewModelScope.launch {
             actors.value = api.lastactors("73fbeeb046f41168a80509da0ee03c8c").results
-        }
-    }
-
-    fun getSingleMovie(id: String?) {
-        viewModelScope.launch {
-            movie.value = api.singlemovie(id.toString(), "73fbeeb046f41168a80509da0ee03c8c", "credits", "fr")
         }
     }
 }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.Text
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -19,13 +20,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Series(viewModel: MainViewModel) {
+fun Series(viewModel: MainViewModel, navController: NavHostController) {
     // Text(text = "Les séries populaires de la semaine")
 
     val series by viewModel.series.collectAsStateWithLifecycle()
@@ -33,14 +36,15 @@ fun Series(viewModel: MainViewModel) {
 
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
         items(series) { serie ->
-            SerieCard(serie)
+            SerieCard(serie, navController)
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun SerieCard(serie: Serie) {
+fun SerieCard(serie: Serie, navController: NavHostController) {
     try {
         var date = serie.first_air_date
         if(date != "")
@@ -56,6 +60,7 @@ fun SerieCard(serie: Serie) {
     }
 
     ElevatedCard(
+        onClick = { navController.navigate("serie/${serie.id}") },
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         modifier = Modifier
             .padding(20.dp)
