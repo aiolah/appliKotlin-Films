@@ -24,67 +24,6 @@ data class Movie(
     val vote_count: Int = 0
 )
 
-// Liste de séries populaires de la semaine
-data class TrendingTvWeek(
-    val page: Int = 0,
-    val results: List<Serie> = listOf()
-)
-
-data class Serie(
-    val adult: Boolean = false,
-    val backdrop_path: String = "",
-    var first_air_date: String = "",
-    val genre_ids: List<Int> = listOf(),
-    val id: Int = 0,
-    val media_type: String = "",
-    val name: String = "",
-    val origin_country: List<String> = listOf(),
-    val original_language: String = "",
-    val original_name: String = "",
-    val overview: String = "",
-    val popularity: Double = 0.0,
-    val poster_path: String = "",
-    val vote_average: Double = 0.0,
-    val vote_count: Int = 0
-)
-
-// Liste des acteurs
-data class TrendingPersonWeek(
-    val page: Int = 0,
-    val results: List<Person> = listOf()
-)
-
-data class Person(
-    val adult: Boolean = false,
-    val gender: Int = 0,
-    val id: Int = 0,
-    val known_for: List<KnownFor> = listOf(),
-    val known_for_department: String = "",
-    val media_type: String = "",
-    val name: String = "",
-    val original_name: String = "",
-    val popularity: Double = 0.0,
-    val profile_path: String = ""
-)
-
-data class KnownFor(
-    val adult: Boolean = false,
-    val backdrop_path: String = "",
-    val genre_ids: List<Int> = listOf(),
-    val id: Int = 0,
-    val media_type: String = "",
-    val original_language: String = "",
-    val original_title: String = "",
-    val overview: String = "",
-    val popularity: Double = 0.0,
-    val poster_path: String = "",
-    val release_date: String = "",
-    val title: String = "",
-    val video: Boolean = false,
-    val vote_average: Double = 0.0,
-    val vote_count: Int = 0
-)
-
 // Affichage d'un film dont on a récupéré l'id
 data class SingleMovie(
     val adult: Boolean = false,
@@ -156,6 +95,32 @@ data class Cast(
     val popularity: Double = 0.0,
     val profile_path: String = ""
 )
+
+// Liste de séries populaires de la semaine
+data class TrendingTvWeek(
+    val page: Int = 0,
+    val results: List<Serie> = listOf()
+)
+
+data class Serie(
+    val adult: Boolean = false,
+    val backdrop_path: String = "",
+    var first_air_date: String = "",
+    val genre_ids: List<Int> = listOf(),
+    val id: Int = 0,
+    val media_type: String = "",
+    val name: String = "",
+    val origin_country: List<String> = listOf(),
+    val original_language: String = "",
+    val original_name: String = "",
+    val overview: String = "",
+    val popularity: Double = 0.0,
+    val poster_path: String = "",
+    val vote_average: Double = 0.0,
+    val vote_count: Int = 0
+)
+
+// Affichage d'une série dont on a récupéré l'id
 data class SingleSerie(
     val adult: Boolean = false,
     val backdrop_path: String = "",
@@ -223,4 +188,106 @@ data class Season(
     val poster_path: String = "",
     val season_number: Int = 0,
     val vote_average: Double = 0.0
+)
+
+// Liste des acteurs
+data class TrendingPersonWeek(
+    val page: Int = 0,
+    val results: List<Person> = listOf()
+)
+
+data class Person(
+    val adult: Boolean = false,
+    val gender: Int = 0,
+    val id: Int = 0,
+    val known_for: List<KnownFor> = listOf(),
+    val known_for_department: String = "",
+    val media_type: String = "",
+    val name: String = "",
+    val original_name: String = "",
+    val popularity: Double = 0.0,
+    val profile_path: String = ""
+)
+
+data class KnownFor(
+    val adult: Boolean = false,
+    val backdrop_path: String = "",
+    val genre_ids: List<Int> = listOf(),
+    val id: Int = 0,
+    val media_type: String = "",
+    val original_language: String = "",
+    val original_title: String = "",
+    val overview: String = "",
+    val popularity: Double = 0.0,
+    val poster_path: String = "",
+    val release_date: String = "",
+    val title: String = "",
+    val video: Boolean = false,
+    val vote_average: Double = 0.0,
+    val vote_count: Int = 0
+)
+
+// Affichage d'un acteur dont on a récupéré l'id
+data class SingleActor(
+    val adult: Boolean = false,
+    val also_known_as: List<String> = listOf(),
+    val biography: String = "",
+    val birthday: String = "",
+    val deathday: Any = Any(),
+    val gender: Int = 0,
+    val homepage: Any = Any(),
+    val id: Int = 0,
+    val imdb_id: String = "",
+    val known_for_department: String = "",
+    val name: String = "",
+    val place_of_birth: String = "",
+    val popularity: Double = 0.0,
+    val profile_path: String = ""
+)
+
+// Affichage des films d'un acteur dont on a récupéré l'id
+data class ActorMovies(
+    val cast: List<ActorCast> = listOf(),
+    val crew: List<Crew> = listOf(),
+    val id: Int = 0
+)
+
+data class ActorCast(
+    val adult: Boolean = false,
+    val backdrop_path: String = "",
+    val character: String = "",
+    val credit_id: String = "",
+    val genre_ids: List<Int> = listOf(),
+    val id: Int = 0,
+    val order: Int = 0,
+    val original_language: String = "",
+    val original_title: String = "",
+    val overview: String = "",
+    val popularity: Double = 0.0,
+    val poster_path: String = "",
+    val release_date: String = "",
+    val title: String = "",
+    val video: Boolean = false,
+    val vote_average: Double = 0.0,
+    val vote_count: Int = 0
+)
+
+data class Crew(
+    val adult: Boolean = false,
+    val backdrop_path: String = "",
+    val credit_id: String = "",
+    val department: String = "",
+    val genre_ids: List<Int> = listOf(),
+    val id: Int = 0,
+    val job: String = "",
+    val original_language: String = "",
+    val original_title: String = "",
+    val overview: String = "",
+    val popularity: Double = 0.0,
+    val poster_path: String = "",
+    val release_date: String = "",
+    val title: String = "",
+    val video: Boolean = false,
+    val vote_average: Double = 0.0,
+    val vote_count: Int = 0
 )

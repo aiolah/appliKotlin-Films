@@ -22,6 +22,9 @@ class MainViewModel : ViewModel() {
 
     var movie = MutableStateFlow(SingleMovie())
     var serie = MutableStateFlow(SingleSerie())
+    var actor = MutableStateFlow(SingleActor())
+
+    var actormovies = MutableStateFlow(ActorMovies())
 
     fun getMovies() {
         viewModelScope.launch {
@@ -62,6 +65,18 @@ class MainViewModel : ViewModel() {
     fun getActors() {
         viewModelScope.launch {
             actors.value = api.lastactors("73fbeeb046f41168a80509da0ee03c8c").results
+        }
+    }
+
+    fun getSingleActor(id: String?) {
+        viewModelScope.launch {
+            actor.value = api.singleactor(id.toString(), "73fbeeb046f41168a80509da0ee03c8c", "fr")
+        }
+    }
+
+    fun getActorMovies(id: String?) {
+        viewModelScope.launch {
+            actormovies.value = api.actormovies(id.toString(), "73fbeeb046f41168a80509da0ee03c8c", "fr")
         }
     }
 }

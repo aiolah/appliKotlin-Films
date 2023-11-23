@@ -1,14 +1,13 @@
 package com.example.premiereapplication
 
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.Text
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,10 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 
 @Composable
-fun Acteurs(viewModel: MainViewModel) {
+fun Actors(viewModel: MainViewModel, navController: NavHostController) {
     val actors by viewModel.actors.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = true) { viewModel.getActors() }
 
@@ -27,14 +27,16 @@ fun Acteurs(viewModel: MainViewModel) {
 
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
         items(actors) { actor ->
-            ActorCard(actor)
+            ActorCard(actor, navController)
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ActorCard(actor: Person) {
+fun ActorCard(actor: Person, navController: NavHostController) {
     ElevatedCard(
+        onClick = { navController.navigate("actor/${actor.id}") },
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         modifier = Modifier
             .padding(20.dp)

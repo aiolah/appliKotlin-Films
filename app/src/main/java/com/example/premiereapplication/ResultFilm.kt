@@ -16,10 +16,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ResultFilm(viewModel: MainViewModel, id: String?) {
+fun ResultFilm(viewModel: MainViewModel, id: String?, navController: NavHostController) {
     val movie by viewModel.movie.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = true) { viewModel.getSingleMovie(id) }
 
@@ -39,7 +40,7 @@ fun ResultFilm(viewModel: MainViewModel, id: String?) {
         item(span = { GridItemSpan(2) }) { Text("Casting", fontWeight = FontWeight.Bold, fontSize = 25.sp, modifier = Modifier.padding(15.dp)) }
 
         items(movie.credits.cast) { actor ->
-            Actor(actor)
+            Actor(actor, navController)
         }
     }
 }

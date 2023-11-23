@@ -31,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -44,9 +45,9 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 @Composable
-fun TitreFilm(titreFilm: String) {
+fun NomActeur(nomActeur: String) {
     Text(
-        text = titreFilm,
+        text = nomActeur,
         fontWeight = FontWeight.Bold,
         fontSize = 30.sp,
         textAlign = TextAlign.Center,
@@ -55,7 +56,7 @@ fun TitreFilm(titreFilm: String) {
 }
 
 @Composable
-fun ImageHorizontale(imagePath: String) {
+fun ImageVerticale(imagePath: String) {
     AsyncImage(
         model = "https://image.tmdb.org/t/p/w780/${imagePath}",
         contentDescription = null,
@@ -63,54 +64,11 @@ fun ImageHorizontale(imagePath: String) {
     )
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun InfosFilm(imagePath: String, date: String, genres: List<Genre>) {
-    var datePrint = date
-
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-        Column {
-            AsyncImage(
-                model = "https://image.tmdb.org/t/p/w780/${imagePath}",
-                contentDescription = null,
-                modifier = Modifier.height(175.dp)
-            )
-        }
-
-        Column(modifier = Modifier.width(85.dp)) {
-            try {
-                if(datePrint != "")
-                {
-                    var res = LocalDate.parse(datePrint)
-                    var dateFormattee = res.format(DateTimeFormatter.ofLocalizedDate((FormatStyle.SHORT)))
-
-                    datePrint = dateFormattee
-                }
-            }
-            catch(e: Exception) {
-                Log.d("VAÏTI", "Erreur date")
-            }
-
-            Text(text = datePrint, modifier = Modifier.padding(7.dp))
-
-            var text = ""
-            for(genre in genres) {
-                text = text + genre.name
-                if(genre != genres.last())
-                {
-                    text = text + ", "
-                }
-            }
-            Text(text = "${text}", fontStyle = FontStyle.Italic)
-        }
-    }
-}
-
-@Composable
-fun Synopsis(text: String) {
+fun Biographie(text: String) {
     Column {
         Row {
-            Text(text = "Synopsis", fontWeight = FontWeight.Bold, fontSize = 25.sp, modifier = Modifier.padding(15.dp))
+            Text(text = "Biographie", fontWeight = FontWeight.Bold, fontSize = 25.sp, modifier = Modifier.padding(15.dp))
         }
 
         Spacer(modifier = Modifier.height(5.dp))
@@ -123,47 +81,43 @@ fun Synopsis(text: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Actor(actor: Cast, navController: NavHostController) {
+fun CastCard(movie: ActorCast, navController: NavHostController) {
     ElevatedCard(
-        onClick = { navController.navigate("actor/${actor.id}") },
+        onClick = { navController.navigate("film/${movie.id}") },
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        modifier = Modifier
-            .padding(20.dp)
-            //.height(325.dp)
-            //.requiredHeight(325.dp)
+        modifier = Modifier.padding(20.dp)
     ) {
         AsyncImage(
-            model = "https://image.tmdb.org/t/p/w780/${actor.profile_path}",
+            model = "https://image.tmdb.org/t/p/w780/${movie.poster_path}",
             contentDescription = null,
         )
-        Text(text = actor.name, modifier = Modifier.padding(7.dp), fontWeight = FontWeight.Bold)
-        Text(text = actor.character, modifier = Modifier.padding(7.dp))
+        Text(text = movie.title, modifier = Modifier.padding(7.dp), fontWeight = FontWeight.Bold)
+        Text(text = "Rôle : " + movie.character, modifier = Modifier.padding(7.dp), fontStyle = FontStyle.Italic)
+        Text(text = movie.release_date, modifier = Modifier.padding(7.dp))
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Film(viewModel: MainViewModel, id: String?, navController: NavHostController) {
-    val movie by viewModel.movie.collectAsStateWithLifecycle()
-    LaunchedEffect(key1 = true) { viewModel.getSingleMovie(id) }
-
-    var date = movie.release_date
-
-    // Text("Voici un film qui a pour id : ${id}")
+fun Actor(viewModel: MainViewModel, id: String?, navController: NavHostController) {
+    val actor by viewModel.actor.collectAsStateWithLifecycle()
+    val actorMovies by viewModel.actormovies.collectAsStateWithLifecycle()
+    LaunchedEffect(key1 = true) {
+        viewModel.getSingleActor(id)
+        viewModel.getActorMovies(id)
+    }
 
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-        item(span = { GridItemSpan(2) }) { TitreFilm(movie.title) }
+        item(span = { GridItemSpan(2) }) { NomActeur(actor.name) }
 
-        item(span = { GridItemSpan(2) }) { ImageHorizontale(movie.backdrop_path) }
+        item(span = { GridItemSpan(2) }) { ImageVerticale(actor.profile_path) }
 
-        item(span = { GridItemSpan(2) }) { InfosFilm(movie.poster_path, date, movie.genres) }
-
-        item(span = { GridItemSpan(2) }) { Synopsis(movie.overview) }
+        item(span = { GridItemSpan(2) }) { Biographie(actor.biography) }
 
         item(span = { GridItemSpan(2) }) { Text("Casting", fontWeight = FontWeight.Bold, fontSize = 25.sp, modifier = Modifier.padding(15.dp)) }
 
-        items(movie.credits.cast) { actor ->
-            Actor(actor, navController)
+        items(actorMovies.cast) { movie ->
+            CastCard(movie, navController)
         }
     }
 }

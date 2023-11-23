@@ -2,6 +2,7 @@ package com.example.premiereapplication
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -97,7 +98,8 @@ sealed class Destination(val destination: String, val label: String, val icon: I
     object SearchSeries: Destination("searchseries", "SearchSeries", R.drawable.films, "Recherche films")
     object ResultSerie: Destination("resultserie/{id}", "ResultFilm", R.drawable.films, "Résultat film")
 
-    object Acteurs : Destination("acteurs", "Acteurs", R.drawable.acteurs, "Acteurs")
+    object Actors : Destination("actors", "Acteurs", R.drawable.acteurs, "Acteurs")
+    object Actor : Destination("actor/{id}", "Acteur", R.drawable.acteurs, "Détails d'un acteur")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,7 +112,7 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
     // currentDestination représente l'étiquette de la destination actuelle
     var currentDestination = navBackStackEntry?.destination?.route;
 
-    val destinations = listOf(Destination.Profil, Destination.Films, Destination.Film, Destination.Series, Destination.Acteurs);
+    val destinations = listOf(Destination.Profil, Destination.Films, Destination.Film, Destination.Series, Destination.Actors);
 
     val viewModel = MainViewModel()
 
@@ -230,18 +232,20 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
         }) { innerPadding ->
         NavHost(navController, startDestination = Destination.Profil.destination,
             Modifier.padding(innerPadding)) {
+            // Pages principales
             composable(Destination.Profil.destination) { Profil(windowSizeClass, navController) }
             composable(Destination.Films.destination) { Films(viewModel, navController) }
             composable(Destination.Series.destination) { Series(viewModel, navController) }
-            composable(Destination.Acteurs.destination) { Acteurs(viewModel) }
+            composable(Destination.Actors.destination) { Actors(viewModel, navController) }
 
+            // Détails films, séries et acteurs
             composable(
                 Destination.Film.destination,
                 arguments = listOf(navArgument("id") { type = NavType.StringType })
             ) { navBackStackEntry ->
                 /* Extracting the id from the route */
-                val id = navBackStackEntry.arguments?.getString("id")
-                Film(viewModel, id)
+                var id = navBackStackEntry.arguments?.getString("id")
+                Film(viewModel, id, navController)
             }
             composable(
                 Destination.Serie.destination,
@@ -250,16 +254,23 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                 val id = navBackStackEntry.arguments?.getString("id")
                 Serie(viewModel, id)
             }
+            composable(
+                Destination.Actor.destination,
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
+            ) { navBackStackEntry ->
+                var id = navBackStackEntry.arguments?.getString("id")
+                Actor(viewModel, id, navController)
+            }
 
+            // Résultats de recherche films et séries
             composable(Destination.SearchFilms.destination) { SearchFilms(viewModel, navController, query) }
             composable(
                 Destination.ResultFilm.destination,
                 arguments = listOf(navArgument("id") { type = NavType.StringType })
             ) { navBackStackEntry ->
                 val id = navBackStackEntry.arguments?.getString("id")
-                ResultFilm(viewModel, id)
+                ResultFilm(viewModel, id, navController)
             }
-
             composable(Destination.SearchSeries.destination) { SearchSeries(viewModel, navController, query) }
             composable(
                 Destination.ResultSerie.destination,
