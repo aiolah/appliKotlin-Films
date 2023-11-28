@@ -79,4 +79,10 @@ class MainViewModel : ViewModel() {
             actormovies.value = api.actormovies(id.toString(), "73fbeeb046f41168a80509da0ee03c8c", "fr")
         }
     }
+
+    fun getSearchActors(query: String) {
+        viewModelScope.launch {
+            actors.value = api.searchactors("73fbeeb046f41168a80509da0ee03c8c", "false", "1", query).results
+        }
+    }
 }

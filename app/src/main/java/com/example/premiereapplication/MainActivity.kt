@@ -100,6 +100,8 @@ sealed class Destination(val destination: String, val label: String, val icon: I
 
     object Actors : Destination("actors", "Acteurs", R.drawable.acteurs, "Acteurs")
     object Actor : Destination("actor/{id}", "Acteur", R.drawable.acteurs, "Détails d'un acteur")
+    object SearchActors: Destination("searchactors", "SearchActors", R.drawable.acteurs, "Recherche acteurs")
+    object ResultActor: Destination("resultactor/{id}", "ResultActor", R.drawable.acteurs, "Résultat acteur")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -144,12 +146,20 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                             {
                                 navController.navigate(Destination.SearchSeries.destination)
                             }
+                            else if(currentDestination == "actors")
+                            {
+                                navController.navigate(Destination.SearchActors.destination)
+                            }
                         },
                         active = active,
                         onActiveChange = {
                             active = it
                         },
-                        placeholder = { Text("Barbie") },
+                        placeholder = {
+                            if(currentDestination == "films") { Text("Barbie") }
+                            else if(currentDestination == "series") { Text("L'Attaque des Titans") }
+                            else if(currentDestination == "actors") { Text("Eddie Redmayne") }
+                        },
                         leadingIcon = { IconButton(
                             onClick = {
                                 val previousBackStackEntry = navController.previousBackStackEntry
@@ -193,7 +203,7 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                                 } else if (currentDestination == "series" || currentDestination == "serie/{id}") {
                                     Text(" - Séries")
                                 }
-                                if(currentDestination == "acteurs") {
+                                if(currentDestination == "actors") {
                                     Text(" - Acteurs")
                                 }
                             }
@@ -278,6 +288,14 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
             ) { navBackStackEntry ->
                 val id = navBackStackEntry.arguments?.getString("id")
                 ResultSerie(viewModel, id)
+            }
+            composable(Destination.SearchActors.destination) { SearchActors(viewModel, navController, query) }
+            composable(
+                Destination.ResultActor.destination,
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
+            ) { navBackStackEntry ->
+                val id = navBackStackEntry.arguments?.getString("id")
+                ResultActor(viewModel, id, navController)
             }
         }
     }

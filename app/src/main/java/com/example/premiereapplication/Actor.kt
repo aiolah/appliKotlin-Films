@@ -79,9 +79,24 @@ fun Biographie(text: String) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CastCard(movie: ActorCast, navController: NavHostController) {
+    var datePrint = movie.release_date
+    try {
+        if(datePrint != "")
+        {
+            var res = LocalDate.parse(datePrint)
+            var dateFormattee = res.format(DateTimeFormatter.ofLocalizedDate((FormatStyle.SHORT)))
+
+            datePrint = dateFormattee
+        }
+    }
+    catch(e: Exception) {
+        Log.d("VAÏTI", "Erreur date")
+    }
+
     ElevatedCard(
         onClick = { navController.navigate("film/${movie.id}") },
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
@@ -93,7 +108,7 @@ fun CastCard(movie: ActorCast, navController: NavHostController) {
         )
         Text(text = movie.title, modifier = Modifier.padding(7.dp), fontWeight = FontWeight.Bold)
         Text(text = "Rôle : " + movie.character, modifier = Modifier.padding(7.dp), fontStyle = FontStyle.Italic)
-        Text(text = movie.release_date, modifier = Modifier.padding(7.dp))
+        Text(text = datePrint, modifier = Modifier.padding(7.dp))
     }
 }
 
