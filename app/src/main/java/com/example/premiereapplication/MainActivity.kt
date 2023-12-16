@@ -124,7 +124,6 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
     val destinations = listOf(
         Destination.Profil,
         Destination.Films,
-        Destination.Film,
         Destination.Series,
         Destination.Actors
     );
@@ -261,24 +260,22 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                     if (currentDestination != "profil") {
                         BottomNavigation(backgroundColor = VertDeau) {
                             destinations.forEach { screen ->
-                                if (screen.destination != "film/{id}") {
-                                    BottomNavigationItem(
-                                        icon = {
-                                            Icon(
-                                                painter = painterResource(screen.icon),
-                                                screen.description,
-                                                modifier = Modifier.fillMaxSize(0.42F)
-                                            )
-                                        },
-                                        label = { Text(screen.label) },
-                                        selected =
-                                        currentDestination == screen.destination,
-                                        onClick = {
-                                            query = ""
-                                            showSearchBar = false
-                                            navController.navigate(screen.destination)
-                                        })
-                                }
+                                BottomNavigationItem(
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(screen.icon),
+                                        screen.description,
+                                        modifier = Modifier.fillMaxSize(0.42F)
+                                    )
+                                },
+                                label = { Text(screen.label) },
+                                selected =
+                                currentDestination == screen.destination,
+                                onClick = {
+                                    query = ""
+                                    showSearchBar = false
+                                    navController.navigate(screen.destination)
+                                })
                             }
                         }
                     }
@@ -494,19 +491,17 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                         if (currentDestination != "profil") {
                             NavigationRail {
                                 destinations.forEachIndexed { index, item ->
-                                    if (item.destination != "film/{id}") {
-                                        NavigationRailItem(
-                                            icon = {
-                                                Icon(
-                                                    painter = painterResource(item.icon),
-                                                    item.description
-                                                )
-                                            },
-                                            label = { Text(item.label) },
-                                            selected = selectedItem == index,
-                                            onClick = { navController.navigate(item.destination) }
-                                        )
-                                    }
+                                    NavigationRailItem(
+                                        icon = {
+                                            Icon(
+                                                painter = painterResource(item.icon),
+                                                item.description
+                                            )
+                                        },
+                                        label = { Text(item.label) },
+                                        selected = selectedItem == index,
+                                        onClick = { selectedItem = index; navController.navigate(item.destination) }
+                                    )
                                 }
                             }
                         }
