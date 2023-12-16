@@ -3,25 +3,15 @@ package com.example.premiereapplication
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -31,7 +21,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -82,7 +71,7 @@ fun Biographie(text: String) {
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CastCard(movie: ActorCast, navController: NavHostController) {
+fun FilmographieCard(movie: ActorCast, navController: NavHostController, view: String) {
     var datePrint = movie.release_date
     try {
         if(datePrint != "")
@@ -102,9 +91,15 @@ fun CastCard(movie: ActorCast, navController: NavHostController) {
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         modifier = Modifier.padding(20.dp)
     ) {
+        val customModifier = Modifier
+            .takeIf { view == "paysage" }
+            ?.then(Modifier.height(150.dp).align(Alignment.CenterHorizontally))
+            ?: Modifier
+
         AsyncImage(
             model = "https://image.tmdb.org/t/p/w780/${movie.poster_path}",
             contentDescription = null,
+            modifier = customModifier
         )
         Text(text = movie.title, modifier = Modifier.padding(7.dp), fontWeight = FontWeight.Bold)
         Text(text = "Rôle : " + movie.character, modifier = Modifier.padding(7.dp), fontStyle = FontStyle.Italic)
@@ -114,7 +109,7 @@ fun CastCard(movie: ActorCast, navController: NavHostController) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Actor(viewModel: MainViewModel, id: String?, navController: NavHostController) {
+fun Actor(viewModel: MainViewModel, id: String?, navController: NavHostController, view: String, numberColumns: Int) {
     val actor by viewModel.actor.collectAsStateWithLifecycle()
     val actorMovies by viewModel.actormovies.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = true) {
@@ -122,17 +117,17 @@ fun Actor(viewModel: MainViewModel, id: String?, navController: NavHostControlle
         viewModel.getActorMovies(id)
     }
 
-    LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-        item(span = { GridItemSpan(2) }) { NomActeur(actor.name) }
+    LazyVerticalGrid(columns = GridCells.Fixed(numberColumns)) {
+        item(span = { GridItemSpan(numberColumns) }) { NomActeur(actor.name) }
 
-        item(span = { GridItemSpan(2) }) { ImageVerticale(actor.profile_path) }
+        item(span = { GridItemSpan(numberColumns) }) { ImageVerticale(actor.profile_path) }
 
-        item(span = { GridItemSpan(2) }) { Biographie(actor.biography) }
+        item(span = { GridItemSpan(numberColumns) }) { Biographie(actor.biography) }
 
-        item(span = { GridItemSpan(2) }) { Text("Casting", fontWeight = FontWeight.Bold, fontSize = 25.sp, modifier = Modifier.padding(15.dp)) }
+        item(span = { GridItemSpan(numberColumns) }) { Text("Filmographie", fontWeight = FontWeight.Bold, fontSize = 25.sp, modifier = Modifier.padding(15.dp)) }
 
         items(actorMovies.cast) { movie ->
-            CastCard(movie, navController)
+            FilmographieCard(movie, navController, view)
         }
     }
 }

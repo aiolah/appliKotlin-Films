@@ -1,5 +1,6 @@
 package com.example.premiereapplication
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -59,6 +60,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -107,6 +110,7 @@ sealed class Destination(val destination: String, val label: String, val icon: I
     object ResultActor: Destination("resultactor/{id}", "ResultActor", R.drawable.acteurs, "Résultat acteur")
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -117,15 +121,24 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
     // currentDestination représente l'étiquette de la destination actuelle
     var currentDestination = navBackStackEntry?.destination?.route;
 
-    val destinations = listOf(Destination.Profil, Destination.Films, Destination.Film, Destination.Series, Destination.Actors);
+    val destinations = listOf(
+        Destination.Profil,
+        Destination.Films,
+        Destination.Film,
+        Destination.Series,
+        Destination.Actors
+    );
 
     val viewModel = MainViewModel()
 
     var showSearchBar by remember { mutableStateOf(false) }
+    var showFloatingButton by remember { mutableStateOf(true) }
 
     // text = Texte qui va s'afficher au fur et à mesure que la personne écrit
     var query by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
+
+    var view = "portrait"
 
     val classeHauteur = windowSizeClass.heightSizeClass
     val classeLargeur = windowSizeClass.widthSizeClass
@@ -177,10 +190,18 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                                                 previousBackStackEntry?.destination
                                             val previousRoute = previousDestination?.route
 
-                                            if (previousRoute == "films" || previousRoute == "series") {
+                                            // Si la route précédente est une route principale alors on n'affiche plus la search bar
+                                            if (previousRoute == "films" || previousRoute == "series" || previousRoute == "actors") {
                                                 showSearchBar = false
                                             }
-                                            navController.popBackStack()
+
+                                            // Si on clique sur la flèche retour de la barre de recherche et qu'on est sur une page principale, on ne l'affiche plus. Sinon, on revient en arrière
+                                            if(currentDestination == "films" || currentDestination == "series" || currentDestination == "actors") {
+                                                showSearchBar = false
+                                            }
+                                            else {
+                                                navController.popBackStack()
+                                            }
                                         }
                                     ) {
                                         Icon(Icons.Default.ArrowBack, contentDescription = null)
@@ -196,9 +217,9 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                                     containerColor = Color.LightGray,
                                     dividerColor = Color.LightGray,
                                     inputFieldColors = TextFieldDefaults.colors()
-                                )
+                                ),
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-
                             }
                         } else {
                             TopAppBar(
@@ -224,7 +245,7 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                                     }
                                 },
                                 actions = {
-                                    IconButton(onClick = { showSearchBar = true }) {
+                                    IconButton(onClick = { showSearchBar = true; query = "" }) {
                                         Image(
                                             painterResource(id = R.drawable.loupe),
                                             contentDescription = "Icône loupe"
@@ -277,11 +298,26 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                         Films(
                             viewModel,
                             navController,
-                            "portrait"
+                            view,
+                            numberColumns(view)
                         )
                     }
-                    composable(Destination.Series.destination) { Series(viewModel, navController, "portrait") }
-                    composable(Destination.Actors.destination) { Actors(viewModel, navController, "portrait") }
+                    composable(Destination.Series.destination) {
+                        Series(
+                            viewModel,
+                            navController,
+                            view,
+                            numberColumns(view)
+                        )
+                    }
+                    composable(Destination.Actors.destination) {
+                        Actors(
+                            viewModel,
+                            navController,
+                            view,
+                            numberColumns(view)
+                        )
+                    }
 
                     // Détails films, séries et acteurs
                     composable(
@@ -290,7 +326,7 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                     ) { navBackStackEntry ->
                         /* Extracting the id from the route */
                         var id = navBackStackEntry.arguments?.getString("id")
-                        Film(viewModel, id, navController)
+                        Film(viewModel, id, navController, view, numberColumns(view))
                     }
                     composable(
                         Destination.Serie.destination,
@@ -304,7 +340,7 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                         arguments = listOf(navArgument("id") { type = NavType.StringType })
                     ) { navBackStackEntry ->
                         var id = navBackStackEntry.arguments?.getString("id")
-                        Actor(viewModel, id, navController)
+                        Actor(viewModel, id, navController, view, numberColumns(view))
                     }
 
                     // Résultats de recherche films et séries
@@ -312,7 +348,9 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                         SearchFilms(
                             viewModel,
                             navController,
-                            query
+                            query,
+                            view,
+                            numberColumns(view)
                         )
                     }
                     composable(
@@ -320,13 +358,15 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                         arguments = listOf(navArgument("id") { type = NavType.StringType })
                     ) { navBackStackEntry ->
                         val id = navBackStackEntry.arguments?.getString("id")
-                        ResultFilm(viewModel, id, navController)
+                        ResultFilm(viewModel, id, navController, view, numberColumns(view))
                     }
                     composable(Destination.SearchSeries.destination) {
                         SearchSeries(
                             viewModel,
                             navController,
-                            query
+                            query,
+                            view,
+                            numberColumns(view)
                         )
                     }
                     composable(
@@ -340,7 +380,9 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                         SearchActors(
                             viewModel,
                             navController,
-                            query
+                            query,
+                            view,
+                            numberColumns(view)
                         )
                     }
                     composable(
@@ -348,7 +390,7 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
                         arguments = listOf(navArgument("id") { type = NavType.StringType })
                     ) { navBackStackEntry ->
                         val id = navBackStackEntry.arguments?.getString("id")
-                        ResultActor(viewModel, id, navController)
+                        ResultActor(viewModel, id, navController, view, numberColumns(view))
                     }
                 }
             }
@@ -356,196 +398,242 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
         else ->
             // Téléphone en mode paysage
             Row {
-                if (currentDestination != "profil") {
-                    NavigationRail {
-                        destinations.forEachIndexed { index, item ->
-                            if (item.destination != "film/{id}") {
-                                NavigationRailItem(
-                                    icon = {
+                view = "paysage"
+
+                Scaffold(
+                    topBar = {
+                        if (currentDestination != "profil") {
+                            if (showSearchBar == true) {
+                                SearchBar(
+                                    query = query,
+                                    onQueryChange = {
+                                        query = it
+                                    },
+                                    onSearch = {
+                                        active = false
+                                        if (currentDestination == "films") {
+                                            navController.navigate(Destination.SearchFilms.destination)
+                                        } else if (currentDestination == "series") {
+                                            navController.navigate(Destination.SearchSeries.destination)
+                                        } else if (currentDestination == "actors") {
+                                            navController.navigate(Destination.SearchActors.destination)
+                                        }
+                                    },
+                                    active = active,
+                                    onActiveChange = {
+                                        active = it
+                                    },
+                                    placeholder = {
+                                        if (currentDestination == "films") {
+                                            Text("Barbie")
+                                        } else if (currentDestination == "series") {
+                                            Text("L'Attaque des Titans")
+                                        } else if (currentDestination == "actors") {
+                                            Text("Eddie Redmayne")
+                                        }
+                                    },
+                                    leadingIcon = {
+                                        IconButton(
+                                            onClick = {
+                                                val previousBackStackEntry =
+                                                    navController.previousBackStackEntry
+                                                val previousDestination =
+                                                    previousBackStackEntry?.destination
+                                                val previousRoute = previousDestination?.route
+
+                                                // Si la route précédente est une route principale alors on n'affiche plus la search bar
+                                                if (previousRoute == "films" || previousRoute == "series" || previousRoute == "actors") {
+                                                    showSearchBar = false
+                                                }
+
+                                                // Si on clique sur la flèche retour de la barre de recherche et qu'on est sur une page principale, on ne l'affiche plus. Sinon, on revient en arrière
+                                                if(currentDestination == "films" || currentDestination == "series" || currentDestination == "actors") {
+                                                    showSearchBar = false
+                                                }
+                                                else {
+                                                    navController.popBackStack()
+                                                }
+                                            }
+                                        ) {
+                                            Icon(Icons.Default.ArrowBack, contentDescription = null)
+                                        }
+                                    },
+                                    trailingIcon = {
                                         Icon(
-                                            painter = painterResource(item.icon),
-                                            item.description
+                                            Icons.Default.MoreVert,
+                                            contentDescription = null
                                         )
                                     },
-                                    label = { Text(item.label) },
-                                    selected = selectedItem == index,
-                                    onClick = { navController.navigate(item.destination) }
+                                    content = {},
+                                    colors = SearchBarDefaults.colors(
+                                        containerColor = Color.LightGray,
+                                        dividerColor = Color.LightGray,
+                                        inputFieldColors = TextFieldDefaults.colors()
+                                    ),
+                                    modifier = Modifier.fillMaxWidth().padding(30.dp, 0.dp)
                                 )
                             }
                         }
-                    }
-
-                    /*FloatingActionButton(
-                        onClick = { showSearchBar = true },
-                        content = {
-                            Icon(Icons.Filled.Search, "Barre de recherche")
-                        },
-                        containerColor = VertDeau,
-                        contentColor = Color.White
-                    )
-
-                    if(showSearchBar == true) {
-                        SearchBar(
-                            query = query,
-                            onQueryChange = {
-                                query = it
-                            },
-                            onSearch = {
-                                active = false
-                                if (currentDestination == "films") {
-                                    navController.navigate(Destination.SearchFilms.destination)
-                                } else if (currentDestination == "series") {
-                                    navController.navigate(Destination.SearchSeries.destination)
-                                } else if (currentDestination == "actors") {
-                                    navController.navigate(Destination.SearchActors.destination)
-                                }
-                            },
-                            active = active,
-                            onActiveChange = {
-                                active = it
-                            },
-                            placeholder = {
-                                if (currentDestination == "films") {
-                                    Text("Barbie")
-                                } else if (currentDestination == "series") {
-                                    Text("L'Attaque des Titans")
-                                } else if (currentDestination == "actors") {
-                                    Text("Eddie Redmayne")
-                                }
-                            },
-                            leadingIcon = {
-                                IconButton(
-                                    onClick = {
-                                        val previousBackStackEntry =
-                                            navController.previousBackStackEntry
-                                        val previousDestination =
-                                            previousBackStackEntry?.destination
-                                        val previousRoute = previousDestination?.route
-
-                                        if (previousRoute == "films" || previousRoute == "series") {
-                                            showSearchBar = false
-                                        }
-                                        navController.popBackStack()
-                                    }
-                                ) {
-                                    Icon(Icons.Default.ArrowBack, contentDescription = null)
-                                }
-                            },
-                            trailingIcon = {
-                                Icon(
-                                    Icons.Default.MoreVert,
-                                    contentDescription = null
-                                )
-                            },
-                            colors = SearchBarDefaults.colors(
-                                containerColor = Color.LightGray,
-                                dividerColor = Color.LightGray,
-                                inputFieldColors = TextFieldDefaults.colors()
+                    },
+                    floatingActionButton = {
+                        if(currentDestination != "profil" && showSearchBar == false) {
+                            FloatingActionButton(
+                                onClick = { showSearchBar = true; showFloatingButton = false; query = "" },
+                                content = {
+                                    Icon(Icons.Filled.Search, "Barre de recherche")
+                                },
+                                containerColor = VertDeau,
+                                contentColor = Color.White,
+                                modifier = Modifier
+                                    .align(Alignment.Bottom)
                             )
-                        ) {
-
                         }
-                    }*/
-                }
+                    }
+                ) {
+                    Row {
+                        if (currentDestination != "profil") {
+                            NavigationRail {
+                                destinations.forEachIndexed { index, item ->
+                                    if (item.destination != "film/{id}") {
+                                        NavigationRailItem(
+                                            icon = {
+                                                Icon(
+                                                    painter = painterResource(item.icon),
+                                                    item.description
+                                                )
+                                            },
+                                            label = { Text(item.label) },
+                                            selected = selectedItem == index,
+                                            onClick = { navController.navigate(item.destination) }
+                                        )
+                                    }
+                                }
+                            }
+                        }
 
-                NavHost(navController, startDestination = Destination.Profil.destination) {
-                    // Pages principales
-                    composable(Destination.Profil.destination) {
-                        Profil(
-                            windowSizeClass,
-                            navController
-                        )
-                    }
-                    composable(Destination.Films.destination) {
-                        Films(
-                            viewModel,
-                            navController,
-                            "paysage"
-                        )
-                    }
-                    composable(Destination.Series.destination) {
-                        Series(
-                            viewModel,
-                            navController,
-                            "paysage"
-                        )
-                    }
-                    composable(Destination.Actors.destination) {
-                        Actors(
-                            viewModel,
-                            navController,
-                            "paysage"
-                        )
-                    }
+                        NavHost(navController, startDestination = Destination.Profil.destination) {
+                            // Pages principales
+                            composable(Destination.Profil.destination) {
+                                Profil(
+                                    windowSizeClass,
+                                    navController
+                                )
+                            }
+                            composable(Destination.Films.destination) {
+                                Films(
+                                    viewModel,
+                                    navController,
+                                    view,
+                                    numberColumns(view)
+                                )
+                            }
+                            composable(Destination.Series.destination) {
+                                Series(
+                                    viewModel,
+                                    navController,
+                                    view,
+                                    numberColumns(view)
+                                )
+                            }
+                            composable(Destination.Actors.destination) {
+                                Actors(
+                                    viewModel,
+                                    navController,
+                                    view,
+                                    numberColumns(view)
+                                )
+                            }
 
-                    // Détails films, séries et acteurs
-                    composable(
-                        Destination.Film.destination,
-                        arguments = listOf(navArgument("id") { type = NavType.StringType })
-                    ) { navBackStackEntry ->
-                        /* Extracting the id from the route */
-                        var id = navBackStackEntry.arguments?.getString("id")
-                        Film(viewModel, id, navController)
-                    }
-                    composable(
-                        Destination.Serie.destination,
-                        arguments = listOf(navArgument("id") { type = NavType.StringType })
-                    ) { navBackStackEntry ->
-                        val id = navBackStackEntry.arguments?.getString("id")
-                        Serie(viewModel, id)
-                    }
-                    composable(
-                        Destination.Actor.destination,
-                        arguments = listOf(navArgument("id") { type = NavType.StringType })
-                    ) { navBackStackEntry ->
-                        var id = navBackStackEntry.arguments?.getString("id")
-                        Actor(viewModel, id, navController)
-                    }
+                            // Détails films, séries et acteurs
+                            composable(
+                                Destination.Film.destination,
+                                arguments = listOf(navArgument("id") { type = NavType.StringType })
+                            ) { navBackStackEntry ->
+                                /* Extracting the id from the route */
+                                var id = navBackStackEntry.arguments?.getString("id")
+                                Film(viewModel, id, navController, view, numberColumns(view))
+                            }
+                            composable(
+                                Destination.Serie.destination,
+                                arguments = listOf(navArgument("id") { type = NavType.StringType })
+                            ) { navBackStackEntry ->
+                                val id = navBackStackEntry.arguments?.getString("id")
+                                Serie(viewModel, id)
+                            }
+                            composable(
+                                Destination.Actor.destination,
+                                arguments = listOf(navArgument("id") { type = NavType.StringType })
+                            ) { navBackStackEntry ->
+                                var id = navBackStackEntry.arguments?.getString("id")
+                                Actor(viewModel, id, navController, view, numberColumns(view))
+                            }
 
-                    // Résultats de recherche films et séries
-                    composable(Destination.SearchFilms.destination) {
-                        SearchFilms(
-                            viewModel,
-                            navController,
-                            query
-                        )
-                    }
-                    composable(
-                        Destination.ResultFilm.destination,
-                        arguments = listOf(navArgument("id") { type = NavType.StringType })
-                    ) { navBackStackEntry ->
-                        val id = navBackStackEntry.arguments?.getString("id")
-                        ResultFilm(viewModel, id, navController)
-                    }
-                    composable(Destination.SearchSeries.destination) {
-                        SearchSeries(
-                            viewModel,
-                            navController,
-                            query
-                        )
-                    }
-                    composable(
-                        Destination.ResultSerie.destination,
-                        arguments = listOf(navArgument("id") { type = NavType.StringType })
-                    ) { navBackStackEntry ->
-                        val id = navBackStackEntry.arguments?.getString("id")
-                        ResultSerie(viewModel, id)
-                    }
-                    composable(Destination.SearchActors.destination) {
-                        SearchActors(
-                            viewModel,
-                            navController,
-                            query
-                        )
-                    }
-                    composable(
-                        Destination.ResultActor.destination,
-                        arguments = listOf(navArgument("id") { type = NavType.StringType })
-                    ) { navBackStackEntry ->
-                        val id = navBackStackEntry.arguments?.getString("id")
-                        ResultActor(viewModel, id, navController)
+                            // Résultats de recherche films et séries
+                            composable(Destination.SearchFilms.destination) {
+                                SearchFilms(
+                                    viewModel,
+                                    navController,
+                                    query,
+                                    view,
+                                    numberColumns(view)
+                                )
+                            }
+                            composable(
+                                Destination.ResultFilm.destination,
+                                arguments = listOf(navArgument("id") { type = NavType.StringType })
+                            ) { navBackStackEntry ->
+                                val id = navBackStackEntry.arguments?.getString("id")
+                                ResultFilm(viewModel, id, navController, view, numberColumns(view))
+                            }
+                            composable(Destination.SearchSeries.destination) {
+                                SearchSeries(
+                                    viewModel,
+                                    navController,
+                                    query,
+                                    view,
+                                    numberColumns(view)
+                                )
+                            }
+                            composable(
+                                Destination.ResultSerie.destination,
+                                arguments = listOf(navArgument("id") { type = NavType.StringType })
+                            ) { navBackStackEntry ->
+                                val id = navBackStackEntry.arguments?.getString("id")
+                                ResultSerie(viewModel, id)
+                            }
+                            composable(Destination.SearchActors.destination) {
+                                SearchActors(
+                                    viewModel,
+                                    navController,
+                                    query,
+                                    view,
+                                    numberColumns(view)
+                                )
+                            }
+                            composable(
+                                Destination.ResultActor.destination,
+                                arguments = listOf(navArgument("id") { type = NavType.StringType })
+                            ) { navBackStackEntry ->
+                                val id = navBackStackEntry.arguments?.getString("id")
+                                ResultActor(viewModel, id, navController, view, numberColumns(view))
+                            }
+                        }
                     }
                 }
             }
     }
+}
+
+fun numberColumns(view: String): Int {
+    var numberColumns = 0
+
+    if(view == "portrait")
+    {
+        numberColumns = 2
+    }
+    else if(view == "paysage") {
+        numberColumns = 3
+    }
+
+    return numberColumns
 }

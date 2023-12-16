@@ -29,24 +29,15 @@ import java.time.format.FormatStyle
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Series(viewModel: MainViewModel, navController: NavHostController, view: String) {
+fun Series(viewModel: MainViewModel, navController: NavHostController, view: String, numberColumns: Int) {
     // Text(text = "Les séries populaires de la semaine")
 
     val series by viewModel.series.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = true) { viewModel.getSeries() }
 
-    if(view == "portrait") {
-        LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-            items(series) { serie ->
-                SerieCardPortrait(serie, navController)
-            }
-        }
-    }
-    else if(view == "paysage") {
-        LazyVerticalGrid(columns = GridCells.Fixed(3)) {
-            items(series) { serie ->
-                SerieCardPaysage(serie, navController)
-            }
+    LazyVerticalGrid(columns = GridCells.Fixed(numberColumns)) {
+        items(series) { serie ->
+            SerieCard(serie, navController, view)
         }
     }
 }
@@ -54,7 +45,7 @@ fun Series(viewModel: MainViewModel, navController: NavHostController, view: Str
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun SerieCardPortrait(serie: Serie, navController: NavHostController) {
+fun SerieCard(serie: Serie, navController: NavHostController, view: String) {
     try {
         var date = serie.first_air_date
         if(date != "")
@@ -75,43 +66,15 @@ fun SerieCardPortrait(serie: Serie, navController: NavHostController) {
         modifier = Modifier
             .padding(20.dp)
     ) {
+        val customModifier = Modifier
+            .takeIf { view == "paysage" }
+            ?.then(Modifier.height(150.dp).align(Alignment.CenterHorizontally))
+            ?: Modifier
+
         AsyncImage(
             model = "https://image.tmdb.org/t/p/w780/${serie.poster_path}",
             contentDescription = null,
-        )
-        Text(text = serie.name, modifier = Modifier.padding(7.dp), fontWeight = FontWeight.Bold)
-        Text(text = serie.first_air_date, modifier = Modifier.padding(7.dp))
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun SerieCardPaysage(serie: Serie, navController: NavHostController) {
-    try {
-        var date = serie.first_air_date
-        if(date != "")
-        {
-            var res = LocalDate.parse(date)
-            var dateFormattee = res.format(DateTimeFormatter.ofLocalizedDate((FormatStyle.SHORT)))
-
-            serie.first_air_date = dateFormattee
-        }
-    }
-    catch(e: Exception) {
-        Log.d("VAÏTI", "Erreur date")
-    }
-
-    ElevatedCard(
-        onClick = { navController.navigate("serie/${serie.id}") },
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        modifier = Modifier
-            .padding(20.dp)
-    ) {
-        AsyncImage(
-            model = "https://image.tmdb.org/t/p/w780/${serie.poster_path}",
-            contentDescription = null,
-            modifier = Modifier.height(150.dp).align(Alignment.CenterHorizontally)
+            modifier = customModifier
         )
         Text(text = serie.name, modifier = Modifier.padding(7.dp), fontWeight = FontWeight.Bold)
         Text(text = serie.first_air_date, modifier = Modifier.padding(7.dp))

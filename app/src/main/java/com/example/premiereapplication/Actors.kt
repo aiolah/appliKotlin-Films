@@ -21,60 +21,37 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 
 @Composable
-fun Actors(viewModel: MainViewModel, navController: NavHostController, view: String) {
+fun Actors(viewModel: MainViewModel, navController: NavHostController, view: String, numberColumns: Int) {
     val actors by viewModel.actors.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = true) { viewModel.getActors() }
 
     // Text(text = "Les acteurs populaires de la semaine")
 
-    if(view == "portrait")
-    {
-        LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-            items(actors) { actor ->
-                ActorCardPortrait(actor, navController)
-            }
-        }
-    }
-    else if(view == "paysage")
-    {
-        LazyVerticalGrid(columns = GridCells.Fixed(3)) {
-            items(actors) { actor ->
-                ActorCardPaysage(actor, navController)
-            }
+    LazyVerticalGrid(columns = GridCells.Fixed(numberColumns)) {
+        items(actors) { actor ->
+            ActorCard(actor, navController, view)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ActorCardPortrait(actor: Person, navController: NavHostController) {
+fun ActorCard(actor: Person, navController: NavHostController, view: String) {
     ElevatedCard(
         onClick = { navController.navigate("actor/${actor.id}") },
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         modifier = Modifier
             .padding(20.dp)
     ) {
-        AsyncImage(
-            model = "https://image.tmdb.org/t/p/w780/${actor.profile_path}",
-            contentDescription = null,
-        )
-        Text(text = actor.name, modifier = Modifier.padding(7.dp), fontWeight = FontWeight.Bold)
-    }
-}
+        val customModifier = Modifier
+            .takeIf { view == "paysage" }
+            ?.then(Modifier.height(150.dp).align(Alignment.CenterHorizontally))
+            ?: Modifier
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ActorCardPaysage(actor: Person, navController: NavHostController) {
-    ElevatedCard(
-        onClick = { navController.navigate("actor/${actor.id}") },
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        modifier = Modifier
-            .padding(20.dp)
-    ) {
         AsyncImage(
             model = "https://image.tmdb.org/t/p/w780/${actor.profile_path}",
             contentDescription = null,
-            modifier = Modifier.height(150.dp).align(Alignment.CenterHorizontally)
+            modifier = customModifier
         )
         Text(text = actor.name, modifier = Modifier.padding(7.dp), fontWeight = FontWeight.Bold)
     }

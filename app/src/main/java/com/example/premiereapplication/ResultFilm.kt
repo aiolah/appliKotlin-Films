@@ -20,7 +20,7 @@ import androidx.navigation.NavHostController
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ResultFilm(viewModel: MainViewModel, id: String?, navController: NavHostController) {
+fun ResultFilm(viewModel: MainViewModel, id: String?, navController: NavHostController, view: String, numberColumns: Int) {
     val movie by viewModel.movie.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = true) { viewModel.getSingleMovie(id) }
 
@@ -28,19 +28,19 @@ fun ResultFilm(viewModel: MainViewModel, id: String?, navController: NavHostCont
 
     // Text("Voici un film qui a pour id : ${id}")
 
-    LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-        item(span = { GridItemSpan(2) }) { TitreFilm(movie.title) }
+    LazyVerticalGrid(columns = GridCells.Fixed(numberColumns)) {
+        item(span = { GridItemSpan(numberColumns) }) { TitreFilm(movie.title) }
 
-        item(span = { GridItemSpan(2) }) { ImageHorizontale(movie.backdrop_path) }
+        item(span = { GridItemSpan(numberColumns) }) { ImageHorizontale(movie.backdrop_path) }
 
-        item(span = { GridItemSpan(2) }) { InfosFilm(movie.poster_path, date, movie.genres) }
+        item(span = { GridItemSpan(numberColumns) }) { InfosFilm(movie.poster_path, date, movie.genres) }
 
-        item(span = { GridItemSpan(2) }) { Synopsis(movie.overview) }
+        item(span = { GridItemSpan(numberColumns) }) { Synopsis(movie.overview) }
 
-        item(span = { GridItemSpan(2) }) { Text("Casting", fontWeight = FontWeight.Bold, fontSize = 25.sp, modifier = Modifier.padding(15.dp)) }
+        item(span = { GridItemSpan(numberColumns) }) { Text("Casting", fontWeight = FontWeight.Bold, fontSize = 25.sp, modifier = Modifier.padding(15.dp)) }
 
         items(movie.credits.cast) { actor ->
-            Actor(actor, navController)
+            ActorFromFilm(actor, navController, view)
         }
     }
 }

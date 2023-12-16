@@ -123,7 +123,7 @@ fun Synopsis(text: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Actor(actor: Cast, navController: NavHostController) {
+fun ActorFromFilm(actor: Cast, navController: NavHostController, view: String) {
     ElevatedCard(
         onClick = { navController.navigate("actor/${actor.id}") },
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
@@ -132,9 +132,15 @@ fun Actor(actor: Cast, navController: NavHostController) {
             //.height(325.dp)
             //.requiredHeight(325.dp)
     ) {
+        val customModifier = Modifier
+            .takeIf { view == "paysage" }
+            ?.then(Modifier.height(150.dp).align(Alignment.CenterHorizontally))
+            ?: Modifier
+
         AsyncImage(
             model = "https://image.tmdb.org/t/p/w780/${actor.profile_path}",
             contentDescription = null,
+            modifier = customModifier
         )
         Text(text = actor.name, modifier = Modifier.padding(7.dp), fontWeight = FontWeight.Bold)
         Text(text = actor.character, modifier = Modifier.padding(7.dp))
@@ -143,7 +149,7 @@ fun Actor(actor: Cast, navController: NavHostController) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Film(viewModel: MainViewModel, id: String?, navController: NavHostController) {
+fun Film(viewModel: MainViewModel, id: String?, navController: NavHostController, view: String, numberColumns: Int) {
     val movie by viewModel.movie.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = true) { viewModel.getSingleMovie(id) }
 
@@ -151,19 +157,19 @@ fun Film(viewModel: MainViewModel, id: String?, navController: NavHostController
 
     // Text("Voici un film qui a pour id : ${id}")
 
-    LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-        item(span = { GridItemSpan(2) }) { TitreFilm(movie.title) }
+    LazyVerticalGrid(columns = GridCells.Fixed(numberColumns)) {
+        item(span = { GridItemSpan(numberColumns) }) { TitreFilm(movie.title) }
 
-        item(span = { GridItemSpan(2) }) { ImageHorizontale(movie.backdrop_path) }
+        item(span = { GridItemSpan(numberColumns) }) { ImageHorizontale(movie.backdrop_path) }
 
-        item(span = { GridItemSpan(2) }) { InfosFilm(movie.poster_path, date, movie.genres) }
+        item(span = { GridItemSpan(numberColumns) }) { InfosFilm(movie.poster_path, date, movie.genres) }
 
-        item(span = { GridItemSpan(2) }) { Synopsis(movie.overview) }
+        item(span = { GridItemSpan(numberColumns) }) { Synopsis(movie.overview) }
 
-        item(span = { GridItemSpan(2) }) { Text("Casting", fontWeight = FontWeight.Bold, fontSize = 25.sp, modifier = Modifier.padding(15.dp)) }
+        item(span = { GridItemSpan(numberColumns) }) { Text("Casting", fontWeight = FontWeight.Bold, fontSize = 25.sp, modifier = Modifier.padding(15.dp)) }
 
         items(movie.credits.cast) { actor ->
-            Actor(actor, navController)
+            ActorFromFilm(actor, navController, view)
         }
     }
 }

@@ -3,6 +3,7 @@ package com.example.premiereapplication
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -14,6 +15,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,7 +28,7 @@ import java.time.format.FormatStyle
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun SearchFilms(viewModel: MainViewModel, navController: NavHostController, query: String) {
+fun SearchFilms(viewModel: MainViewModel, navController: NavHostController, query: String, view: String, numberColumns: Int) {
     // Observation dans un composant compose, transforme le MutableStateFlow en une liste
     val movies by viewModel.movies.collectAsStateWithLifecycle()
 
@@ -36,7 +38,7 @@ fun SearchFilms(viewModel: MainViewModel, navController: NavHostController, quer
         viewModel.getSearchMovies(query)
     }
 
-    LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+    LazyVerticalGrid(columns = GridCells.Fixed(numberColumns)) {
         items(movies) { movie ->
             try {
                 var date = movie.release_date
@@ -52,14 +54,14 @@ fun SearchFilms(viewModel: MainViewModel, navController: NavHostController, quer
                 Log.d("VAÏTI", "Erreur date")
             }
 
-            ResultMovieCard(movie, navController)
+            ResultMovieCard(movie, navController, view)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ResultMovieCard(movie: Movie, navController: NavHostController) {
+fun ResultMovieCard(movie: Movie, navController: NavHostController, view: String) {
     ElevatedCard(
         onClick = { navController.navigate("resultfilm/${movie.id}") },
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
@@ -68,9 +70,15 @@ fun ResultMovieCard(movie: Movie, navController: NavHostController) {
         //.height(325.dp)
         //.requiredHeight(325.dp)
     ) {
+        val customModifier = Modifier
+            .takeIf { view == "paysage" }
+            ?.then(Modifier.height(150.dp).align(Alignment.CenterHorizontally))
+            ?: Modifier
+
         AsyncImage(
             model = "https://image.tmdb.org/t/p/w780/${movie.poster_path}",
             contentDescription = null,
+            modifier = customModifier
         )
         Text(text = movie.title, modifier = Modifier.padding(7.dp), fontWeight = FontWeight.Bold)
         Text(text = movie.release_date, modifier = Modifier.padding(7.dp))
