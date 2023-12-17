@@ -5,6 +5,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface Api {
+    // Requêtes API pour les films
     @GET("trending/movie/week")
     suspend fun lastmovies(@Query("api_key") api_key: String, @Query("language") language:  String): TrendingMovieWeek
     @GET("movie/{id}")
@@ -12,6 +13,7 @@ interface Api {
     @GET("search/movie")
     suspend fun searchmovies(@Query("api_key") api_key: String, @Query("include_adult") include_adults: String, @Query("page") page: String, @Query("query") query: String): TrendingMovieWeek
 
+    // Requêtes API pour les séries
     @GET("trending/tv/week")
     suspend fun lastseries(@Query("api_key") api_key: String, @Query("language") language:  String): TrendingTvWeek
     @GET("tv/{id}")
@@ -19,6 +21,7 @@ interface Api {
     @GET("search/tv")
     suspend fun searchseries(@Query("api_key") api_key: String, @Query("include_adult") include_adults: String, @Query("page") page: String, @Query("query") query: String): TrendingTvWeek
 
+    // Requêtes API pour les acteurs
     @GET("trending/person/week")
     suspend fun lastactors(@Query("api_key") api_key: String): TrendingPersonWeek
     @GET("person/{id}")

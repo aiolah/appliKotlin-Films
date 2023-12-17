@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 
+// Composant qui affiche les résultats d'un film recherché
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ResultFilm(viewModel: MainViewModel, id: String?, navController: NavHostController, view: String, numberColumns: Int) {

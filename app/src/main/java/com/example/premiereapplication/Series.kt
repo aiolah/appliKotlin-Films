@@ -27,6 +27,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
+// Composant qui affiche la liste des séries tendances de la semaine
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Series(viewModel: MainViewModel, navController: NavHostController, view: String, numberColumns: Int) {
@@ -42,6 +43,7 @@ fun Series(viewModel: MainViewModel, navController: NavHostController, view: Str
     }
 }
 
+// Composant qui affiche la card d'une série
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

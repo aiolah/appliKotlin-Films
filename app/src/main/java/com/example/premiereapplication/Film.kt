@@ -121,6 +121,7 @@ fun Synopsis(text: String) {
     }
 }
 
+// Composant qui affiche une card d'un acteur d'un film
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActorFromFilm(actor: Cast, navController: NavHostController, view: String) {
@@ -147,6 +148,7 @@ fun ActorFromFilm(actor: Cast, navController: NavHostController, view: String) {
     }
 }
 
+// Composant qui affiche les détails d'un film
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Film(viewModel: MainViewModel, id: String?, navController: NavHostController, view: String, numberColumns: Int) {

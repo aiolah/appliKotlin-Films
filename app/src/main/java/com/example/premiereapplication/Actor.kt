@@ -68,6 +68,7 @@ fun Biographie(text: String) {
     }
 }
 
+// Composant qui affiche une card d'un film relié à un acteur
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,6 +108,7 @@ fun FilmographieCard(movie: ActorCast, navController: NavHostController, view: S
     }
 }
 
+// Composant qui affiche les détails d'un acteur
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Actor(viewModel: MainViewModel, id: String?, navController: NavHostController, view: String, numberColumns: Int) {

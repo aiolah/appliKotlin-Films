@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+// Composant qui affiche les détails d'une série recherchée
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ResultSerie(viewModel: MainViewModel, id: String?) {

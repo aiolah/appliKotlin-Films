@@ -26,6 +26,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
+// Composant qui affiche la liste des films tendances de la semaine
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Films(viewModel: MainViewModel, navController: NavHostController, view: String, numberColumns: Int) {
@@ -67,6 +68,7 @@ fun Films(viewModel: MainViewModel, navController: NavHostController, view: Stri
     }
 }
 
+// Composant qui affiche une card d'un film
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieCard(movie: Movie, navController: NavHostController, view: String) {

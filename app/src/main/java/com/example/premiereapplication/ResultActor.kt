@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 
+// Composant qui affiche les résultats d'un acteur recherché
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ResultActor(viewModel: MainViewModel, id: String?, navController: NavHostController, view: String, numberColumns: Int) {

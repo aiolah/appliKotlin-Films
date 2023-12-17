@@ -20,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 
+// Composant qui affiche la liste des acteurs tendances de la semaine
 @Composable
 fun Actors(viewModel: MainViewModel, navController: NavHostController, view: String, numberColumns: Int) {
     val actors by viewModel.actors.collectAsStateWithLifecycle()
@@ -34,6 +35,7 @@ fun Actors(viewModel: MainViewModel, navController: NavHostController, view: Str
     }
 }
 
+// Composant qui affiche la card d'un acteur
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActorCard(actor: Person, navController: NavHostController, view: String) {

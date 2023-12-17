@@ -16,16 +16,20 @@ class MainViewModel : ViewModel() {
         .build();
     val api = retrofit.create(Api::class.java)
 
+    // Liste de films, séries et acteurs
     var movies = MutableStateFlow<List<Movie>>(listOf())
     var series = MutableStateFlow<List<Serie>>(listOf())
     var actors = MutableStateFlow<List<Person>>(listOf())
 
+    // Détails d'un film, d'une série et d'un acteur
     var movie = MutableStateFlow(SingleMovie())
     var serie = MutableStateFlow(SingleSerie())
     var actor = MutableStateFlow(SingleActor())
 
+    // Films d'un acteur
     var actormovies = MutableStateFlow(ActorMovies())
 
+    // Films
     fun getMovies() {
         viewModelScope.launch {
             movies.value = api.lastmovies("73fbeeb046f41168a80509da0ee03c8c", "fr").results
@@ -44,6 +48,7 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    // Séries
     fun getSeries() {
         viewModelScope.launch {
             series.value = api.lastseries("73fbeeb046f41168a80509da0ee03c8c", "fr").results
@@ -62,6 +67,7 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    // Acteurs
     fun getActors() {
         viewModelScope.launch {
             actors.value = api.lastactors("73fbeeb046f41168a80509da0ee03c8c").results

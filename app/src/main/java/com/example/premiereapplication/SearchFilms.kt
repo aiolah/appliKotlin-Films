@@ -26,6 +26,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
+// Composant qui affiche les résultats d'une recherche d'un film
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SearchFilms(viewModel: MainViewModel, navController: NavHostController, query: String, view: String, numberColumns: Int) {
@@ -59,6 +60,7 @@ fun SearchFilms(viewModel: MainViewModel, navController: NavHostController, quer
     }
 }
 
+// Composant qui affiche une card d'un film
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResultMovieCard(movie: Movie, navController: NavHostController, view: String) {

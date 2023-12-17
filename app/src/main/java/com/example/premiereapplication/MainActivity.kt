@@ -93,6 +93,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// Toutes les routes de l'application
 sealed class Destination(val destination: String, val label: String, val icon: Int, val description: String) {
     object Profil: Destination("profil", "Mon Profil", R.drawable.user, "Profil")
     object Films: Destination("films", "Films", R.drawable.films, "Films")
@@ -121,6 +122,7 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
     // currentDestination représente l'étiquette de la destination actuelle
     var currentDestination = navBackStackEntry?.destination?.route;
 
+    // Routes pour lesquelles on va afficher une icône
     val destinations = listOf(
         Destination.Profil,
         Destination.Films,
@@ -133,7 +135,7 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
     var showSearchBar by remember { mutableStateOf(false) }
     var showFloatingButton by remember { mutableStateOf(true) }
 
-    // text = Texte qui va s'afficher au fur et à mesure que la personne écrit
+    // query = Recherche de l'utilisateur
     var query by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
 
@@ -141,6 +143,7 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
 
     val classeHauteur = windowSizeClass.heightSizeClass
     val classeLargeur = windowSizeClass.widthSizeClass
+
     var selectedItem by remember { mutableStateOf(0) }
 
     when (classeLargeur) {
@@ -619,6 +622,7 @@ fun Navigation(windowSizeClass: WindowSizeClass) {
     }
 }
 
+// Fonction qui renvoie le nombre de colonnes d'une lazyVerticalGrid en fonction de la view passée en paramètre
 fun numberColumns(view: String): Int {
     var numberColumns = 0
 

@@ -113,6 +113,7 @@ fun Company(company: ProductionCompany) {
     }
 }
 
+// Composant qui affiche les détails d'une série
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Serie(viewModel: MainViewModel, id: String?) {
